@@ -1,0 +1,26 @@
+---
+Checks: '
+  -*,
+  clang-diagnostic-*,
+  clang-analyzer-*,
+  -clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling,
+  bugprone-*,
+  -bugprone-easily-swappable-parameters,
+  performance-*,
+  portability-*,
+  readability-*,
+  -readability-implicit-bool-conversion,
+  -readability-uppercase-literal-suffix,
+  -readability-identifier-length,
+  misc-const-correctness
+'
+CheckOptions:
+  - key: misc-const-correctness.TransformPointers
+    value: true
+  - key: misc-const-correctness.TransformValues
+    value: true
+  - key: misc-const-correctness.TransformReferences
+    value: true
+WarningsAsErrors: '*'
+HeaderFilterRegex: '(src|include)/.*'
+FormatStyle: file
