@@ -1,1 +1,1 @@
-# memory_profiling_suite
+# Memory Benchmark Suite
