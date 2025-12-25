@@ -21,7 +21,7 @@ namespace common
     }
 
     template <typename T>
-    [[nodiscard]] std::unique_ptr<T, void (*)(void*)> allocate_aligned_buffer(const std::size_t num_elements,
+    [[nodiscard]] std::unique_ptr<T, void (*)(void*)> allocate_aligned_buffer(const std::size_t size_bytes,
                                                                               const std::size_t alignment_bytes)
     {
         if (alignment_bytes == 0 || (alignment_bytes & (alignment_bytes - 1)) != 0)
@@ -36,8 +36,7 @@ namespace common
         }
 
         const auto alignment_mask = ~(alignment_bytes - 1);
-        const auto raw_size = num_elements * sizeof(T);
-        const auto size = (raw_size + (alignment_bytes - 1)) & alignment_mask;
+        const auto size = (size_bytes + (alignment_bytes - 1)) & alignment_mask;
 
         void* const ptr = std::aligned_alloc(alignment_bytes, size);
         if (ptr == nullptr)
