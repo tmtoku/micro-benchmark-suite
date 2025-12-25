@@ -36,10 +36,10 @@ namespace latency_benchmark
         }
     }  // namespace detail
 
-    [[nodiscard]] inline MemoryAddress generate_random_pointer_chasing(MemoryAddress* const buffer,
-                                                                       const std::size_t num_elements,
-                                                                       const std::size_t padded_bytes_per_element,
-                                                                       const std::uint64_t seed)
+    [[nodiscard]] inline MemoryAddress* generate_random_pointer_chasing(MemoryAddress* const buffer,
+                                                                        const std::size_t num_elements,
+                                                                        const std::size_t padded_bytes_per_element,
+                                                                        const std::uint64_t seed)
     {
         if (buffer == nullptr || num_elements == 0)
         {
@@ -70,19 +70,21 @@ namespace latency_benchmark
         for (std::size_t i = 0; i < num_elements - 1; ++i)
         {
             // indices[i] -> indices[i+1]
-            MemoryAddress* current_ptr = detail::get_element_location(buffer, indices[i], padded_bytes_per_element);
-            MemoryAddress* next_ptr = detail::get_element_location(buffer, indices[i + 1], padded_bytes_per_element);
+            MemoryAddress* const current_ptr =
+                detail::get_element_location(buffer, indices[i], padded_bytes_per_element);
+            MemoryAddress* const next_ptr =
+                detail::get_element_location(buffer, indices[i + 1], padded_bytes_per_element);
             *current_ptr = reinterpret_cast<MemoryAddress>(next_ptr);
         }
 
         // indices[num_elements-1] -> indices[0]
-        MemoryAddress* last_ptr =
+        MemoryAddress* const last_ptr =
             detail::get_element_location(buffer, indices[num_elements - 1], padded_bytes_per_element);
-        MemoryAddress* first_ptr = detail::get_element_location(buffer, indices[0], padded_bytes_per_element);
+        MemoryAddress* const first_ptr = detail::get_element_location(buffer, indices[0], padded_bytes_per_element);
         *last_ptr = reinterpret_cast<MemoryAddress>(first_ptr);
 
         // Return the entry point of the cyclic list
-        return reinterpret_cast<MemoryAddress>(first_ptr);
+        return first_ptr;
     }
 
 }  // namespace latency_benchmark
