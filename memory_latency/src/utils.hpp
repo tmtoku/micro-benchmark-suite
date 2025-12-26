@@ -10,7 +10,7 @@
 #include <string>
 #include <vector>
 
-namespace latency_benchmark
+namespace memory_latency
 {
     using MemoryAddress = void*;
 
@@ -87,4 +87,4 @@ namespace latency_benchmark
         return first_ptr;
     }
 
-}  // namespace latency_benchmark
+}  // namespace memory_latency

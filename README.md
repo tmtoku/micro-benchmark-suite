@@ -1,1 +1,1 @@
-# Memory Benchmark Suite
+# Micro-benchmark Suite

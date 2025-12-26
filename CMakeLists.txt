@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.10)
-project(memory_benchmark_suite LANGUAGES C CXX)
+project(micro_benchmark_suite LANGUAGES C CXX)
 
-set(MEMORY_BENCHMARK_SUITE_ARCH "native" CACHE STRING "Target architecture (e.g., native, skylake, znver2)")
-message(STATUS "MEMORY_BENCHMARK_SUITE_ARCH: ${MEMORY_BENCHMARK_SUITE_ARCH}")
+set(MICRO_BENCHMARK_SUITE_ARCH "native" CACHE STRING "Target architecture (e.g., native, skylake, znver2)")
+message(STATUS "MICRO_BENCHMARK_SUITE_ARCH: ${MICRO_BENCHMARK_SUITE_ARCH}")
 
 #
 # Build type configuration
@@ -40,8 +40,8 @@ add_subdirectory(externals/perf-counter)
 #
 # Common utilities
 #
-add_library(memory_benchmark_common INTERFACE)
-target_include_directories(memory_benchmark_common INTERFACE
+add_library(micro_benchmark_common INTERFACE)
+target_include_directories(micro_benchmark_common INTERFACE
     ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
@@ -49,10 +49,10 @@ target_include_directories(memory_benchmark_common INTERFACE
 # Compile options
 #
 add_compile_options(-Wall -Wextra -Wpedantic)
-add_compile_options(-g -O3 -march=${MEMORY_BENCHMARK_SUITE_ARCH})
+add_compile_options(-g -O3 -march=${MICRO_BENCHMARK_SUITE_ARCH})
 
 #
 # Subdirectories
 #
-add_subdirectory(latency_benchmark)
+add_subdirectory(memory_latency)
 
