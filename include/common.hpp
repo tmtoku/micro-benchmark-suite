@@ -11,6 +11,10 @@
 
 namespace common
 {
+    constexpr auto KiB = std::size_t{1024};
+    constexpr auto MiB = std::size_t{1024} * KiB;
+    constexpr auto GiB = std::size_t{1024} * MiB;
+
     [[nodiscard]] inline std::size_t get_cache_line_bytes()
     {
         const auto cache_line_bytes = sysconf(_SC_LEVEL1_DCACHE_LINESIZE);
@@ -50,18 +54,15 @@ namespace common
                     std::size_t value = 0;
                     std::string unit;
 
-                    // "Hugepagesize:", "2048", "kB"
                     ss >> label >> value >> unit;
 
                     if (unit == "kB")
                     {
-                        constexpr auto KB = std::size_t{1024};
-                        return value * KB;
+                        return value * KiB;
                     }
                     if (unit == "MB")
                     {
-                        constexpr auto MB = std::size_t{1024} * std::size_t{1024};
-                        return value * MB;
+                        return value * MiB;
                     }
                     throw std::runtime_error("Unknown unit for Hugepagesize in /proc/meminfo: " + unit);
                 }
@@ -73,7 +74,7 @@ namespace common
     }
 
     template <typename T>
-    [[nodiscard]] std::unique_ptr<T, void (*)(void*)> allocate_aligned_buffer(const std::size_t size_bytes,
+    [[nodiscard]] std::unique_ptr<T, void (*)(void*)> allocate_aligned_buffer(const std::size_t buffer_size_in_bytes,
                                                                               const std::size_t alignment_bytes)
     {
         if (alignment_bytes == 0 || (alignment_bytes & (alignment_bytes - 1)) != 0)
@@ -88,14 +89,14 @@ namespace common
         }
 
         const auto alignment_mask = ~(alignment_bytes - 1);
-        const auto size = (size_bytes + (alignment_bytes - 1)) & alignment_mask;
+        const auto size = (buffer_size_in_bytes + (alignment_bytes - 1)) & alignment_mask;
 
-        void* const ptr = std::aligned_alloc(alignment_bytes, size);
-        if (ptr == nullptr)
+        void* const buffer = std::aligned_alloc(alignment_bytes, size);
+        if (buffer == nullptr)
         {
             throw std::bad_alloc();
         }
 
-        return {static_cast<T*>(ptr), std::free};
+        return {static_cast<T*>(buffer), std::free};
     }
 }  // namespace common
