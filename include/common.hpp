@@ -2,8 +2,10 @@
 
 #include <unistd.h>
 #include <cstdlib>
+#include <fstream>
 #include <memory>
 #include <new>
+#include <sstream>
 #include <stdexcept>
 #include <string>
 
@@ -18,6 +20,56 @@ namespace common
         }
 
         return static_cast<std::size_t>(cache_line_bytes);
+    }
+
+    [[nodiscard]] inline std::size_t get_page_size()
+    {
+        const auto page_size = sysconf(_SC_PAGESIZE);
+        if (page_size < 1)
+        {
+            throw std::runtime_error("Failed to get the page size.");
+        }
+        return static_cast<std::size_t>(page_size);
+    }
+
+    [[nodiscard]] inline std::size_t get_hugepage_size()
+    {
+        static const auto hugepage_size = []() {
+            std::ifstream ifs("/proc/meminfo");
+            std::string line;
+            if (!ifs.is_open())
+            {
+                throw std::runtime_error("Failed to open /proc/meminfo to get the hugepage size.");
+            }
+            while (std::getline(ifs, line))
+            {
+                if (line.find("Hugepagesize:") != std::string::npos)
+                {
+                    std::stringstream ss(line);
+                    std::string label;
+                    std::size_t value = 0;
+                    std::string unit;
+
+                    // "Hugepagesize:", "2048", "kB"
+                    ss >> label >> value >> unit;
+
+                    if (unit == "kB")
+                    {
+                        constexpr auto KB = std::size_t{1024};
+                        return value * KB;
+                    }
+                    if (unit == "MB")
+                    {
+                        constexpr auto MB = std::size_t{1024} * std::size_t{1024};
+                        return value * MB;
+                    }
+                    throw std::runtime_error("Unknown unit for Hugepagesize in /proc/meminfo: " + unit);
+                }
+            }
+            throw std::runtime_error("Could not find 'Hugepagesize' entry in /proc/meminfo.");
+        }();
+
+        return hugepage_size;
     }
 
     template <typename T>
