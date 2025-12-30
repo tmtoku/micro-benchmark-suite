@@ -1,0 +1,26 @@
+[project]
+name = "memory-latency-scripts"
+version = "0.1.0"
+description = "Memory Latency Benchmark Analysis Scripts"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "humanize>=4.15.0",
+    "matplotlib>=3.10.8",
+    "numpy>=2.4.0",
+    "pandas>=2.3.3",
+]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.14.10",
+]
+
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+
+[tool.ruff.format]
+quote-style = "double"
