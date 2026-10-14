@@ -21,6 +21,15 @@ namespace perf_events
         "amd64_fam17h_zen2::DATA_CACHE_REFILLS_FROM_SYSTEM"
         ":LS_MABRESP_LCL_DRAM"
         ":LS_MABRESP_RMT_DRAM";
+    constexpr auto L2_READ_REQUEST =
+        "amd64_fam17h_zen2::REQUESTS_TO_L2_GROUP1"
+        ":RD_BLK_L"
+        ":LS_RD_BLK_C_S";
+    constexpr auto L2_READ_REQUEST_HIT =
+        "amd64_fam17h_zen2::CORE_TO_L2_CACHEABLE_REQUEST_ACCESS_STATUS"
+        ":LS_RD_BLK_C_S"
+        ":LS_RD_BLK_L_HIT_X"
+        ":LS_RD_BLK_L_HIT_S";
     constexpr auto L1_TLB_MISS =
         "amd64_fam17h_zen2::L1_DTLB_MISS"
         ":TLB_RELOAD_4K_L2_HIT"

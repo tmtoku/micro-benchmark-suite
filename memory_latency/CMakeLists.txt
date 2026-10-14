@@ -17,3 +17,13 @@ target_link_libraries(tlb_latency PRIVATE
     micro_benchmark_common
     perf_counter::perf_counter
 )
+
+add_executable(page_aliasing_latency
+    src/page_aliasing_latency.cpp
+    src/utils.hpp
+)
+
+target_link_libraries(page_aliasing_latency PRIVATE
+    micro_benchmark_common
+    perf_counter::perf_counter
+)

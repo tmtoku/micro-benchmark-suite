@@ -35,6 +35,7 @@ cmake -B build -DCMAKE_BUILD_TYPE=Release -DMICRO_BENCHMARK_SUITE_ARCH=znver2
 - **memory_latency**
   - **cache_latency** — load latency at each cache level, measured via random pointer chasing to minimize hardware prefetcher effects
   - **tlb_latency** — L1 and L2 TLB miss latency, measured using aliased virtual pages to minimize cache-miss effects
+  - **page_aliasing_latency** — load latency with different numbers of virtual aliases per physical page
 - **memory_throughput** — load throughput at each cache level, measured across multiple thread counts
 - **integer_division** — `idivq` latency with different dividend or quotient bit lengths
 
