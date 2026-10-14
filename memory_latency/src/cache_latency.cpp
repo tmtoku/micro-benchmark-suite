@@ -38,10 +38,10 @@ namespace memory_latency
                       << result.l3_miss_count << "\n";
         }
 
+        template <std::int32_t NUM_LOGICAL_LOADS>
         std::optional<BenchmarkResult> measure_pointer_chasing(MemoryAddress* const start_ptr,
                                                                perf_counter& cycle_counter)
         {
-            constexpr auto NUM_LOGICAL_LOADS = std::int32_t{1'000'000};
             constexpr auto NUM_TRIALS = std::int32_t{10};
             constexpr auto NUM_WARMUPS = std::int32_t{3};
 
@@ -139,7 +139,7 @@ namespace memory_latency
             {
                 auto* const start_ptr =
                     generate_random_pointer_chasing(buffer.get(), num_elements, padded_bytes_per_element, i);
-                const auto result = measure_pointer_chasing(start_ptr, cycle_counter);
+                const auto result = measure_pointer_chasing<NUM_LOGICAL_LOADS>(start_ptr, cycle_counter);
                 if (!result)
                 {
                     perf_counter_close(&cycle_counter);
