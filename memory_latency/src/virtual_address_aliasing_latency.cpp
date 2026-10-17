@@ -31,7 +31,8 @@ namespace memory_latency
 
         void print_csv_header()
         {
-            std::cout << "BufferSize,PageSize,NumAliases,NumLogicalLoads,Cycles,L1DMisses,L2ReadRequests,L2ReadRequestHits\n";
+            std::cout
+                << "BufferSize,PageSize,NumAliases,NumLogicalLoads,Cycles,L1DMisses,L2ReadRequests,L2ReadRequestHits\n";
         }
 
         void print_csv_row(const std::size_t buffer_size, const std::size_t page_size, const std::size_t num_aliases,
