@@ -35,7 +35,7 @@ endif()
 #
 # External libraries
 #
-add_subdirectory(externals/perf-counter)
+add_subdirectory(external/perf-counter)
 find_package(OpenMP REQUIRED)
 
 #
