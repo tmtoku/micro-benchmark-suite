@@ -81,7 +81,7 @@ namespace common
 
     [[nodiscard]] inline std::size_t get_hugepage_size()
     {
-        static const auto hugepage_size = []() {
+        static const auto hugepage_size = [] {
             std::ifstream ifs("/proc/meminfo");
             std::string line;
             if (!ifs.is_open())
@@ -114,6 +114,16 @@ namespace common
         }();
 
         return hugepage_size;
+    }
+
+    [[nodiscard]] inline std::size_t get_l1d_cache_ways()
+    {
+        const auto num_l1d_ways = sysconf(_SC_LEVEL1_DCACHE_ASSOC);
+        if (num_l1d_ways < 1)
+        {
+            throw std::runtime_error("Failed to get the L1D associativity.");
+        }
+        return static_cast<std::size_t>(num_l1d_ways);
     }
 
     struct MunmapDeleter

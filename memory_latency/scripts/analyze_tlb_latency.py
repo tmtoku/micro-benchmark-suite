@@ -27,9 +27,9 @@ def load_data(filename: str) -> pd.DataFrame:
     df = pd.read_csv(filename)
     num_loads = df["NumLogicalLoads"]
     df["Latency"] = df["Cycles"] / num_loads
-    df["NumVirtualPages"] = df["BufferSize"] // df["PageSize"]
     df["L1_TLB_miss"] = (df["L1TLBMisses"] / num_loads).clip(0, 1)
     df["L2_TLB_miss"] = (df["L2TLBMisses"] / num_loads).clip(0, 1)
+    df["L1D_miss"] = (df["L2ReadRequests"] / num_loads).clip(0, 1)
     df["L1_TLB_hit"] = (1 - df["L1_TLB_miss"]).clip(0, 1)
     df["L2_TLB_hit"] = (df["L1_TLB_miss"] - df["L2_TLB_miss"]).clip(0, 1)
     return df
@@ -87,30 +87,28 @@ def print_tlb_latency_estimates(
     print()
 
 
-def plot_tlb_boundaries(
+def print_max_l1d_miss_rate(df: pd.DataFrame) -> None:
+    print(f"Max L1D miss rate: {df['L1D_miss'].max() * 100:.3f}%")
+
+
+def plot_l1_tlb_boundary(
     ax: Axes,
     num_l1_tlb_entries: int,
-    num_l2_tlb_entries: int,
     show_label: bool = True,
 ) -> None:
-    xform = ax.get_xaxis_transform()
-    for num_entries, label in [
-        (num_l1_tlb_entries, "L1 TLB"),
-        (num_l2_tlb_entries, "L2 TLB"),
-    ]:
-        ax.axvline(num_entries, color="gray", linestyle=":", linewidth=0.8, zorder=0)
-        if show_label:
-            ax.text(
-                num_entries,
-                1.01,
-                label,
-                ha="center",
-                va="bottom",
-                fontsize=7,
-                color="gray",
-                transform=xform,
-                clip_on=False,
-            )
+    ax.axvline(num_l1_tlb_entries, color="gray", linestyle=":", linewidth=0.8, zorder=0)
+    if show_label:
+        ax.text(
+            num_l1_tlb_entries,
+            1.01,
+            "L1 TLB",
+            ha="center",
+            va="bottom",
+            fontsize=7,
+            color="gray",
+            transform=ax.get_xaxis_transform(),
+            clip_on=False,
+        )
 
 
 def plot_tlb_miss_cost_estimates(
@@ -143,18 +141,17 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("filename")
     parser.add_argument("--l1-tlb-entries", required=True, type=int)
-    parser.add_argument("--l2-tlb-entries", required=True, type=int)
     parser.add_argument("--output", default="tlb_latency.pdf")
     args = parser.parse_args()
 
     num_l1_tlb_entries = args.l1_tlb_entries
-    num_l2_tlb_entries = args.l2_tlb_entries
 
     df = load_data(args.filename)
     l1_tlb_load_latency, l2_tlb_load_latency, page_table_load_latency = estimate_tlb_latency(df)
     l1_tlb_miss_cost = l2_tlb_load_latency - l1_tlb_load_latency
     l2_tlb_miss_cost = page_table_load_latency - l2_tlb_load_latency
 
+    print_max_l1d_miss_rate(df)
     print_tlb_latency_estimates(l1_tlb_load_latency, l1_tlb_miss_cost, l2_tlb_miss_cost)
 
     data = df.sort_values("NumVirtualPages")
@@ -175,10 +172,12 @@ def main() -> None:
         marker="o",
         linewidth=1.0,
     )
+    max_latency = max(data["AdditionalLoadLatency"].max(), l1_tlb_miss_cost + l2_tlb_miss_cost)
+    ax_latency.set_ylim(top=max_latency * 1.02)
     ax_latency.yaxis.set_major_locator(ticker.MultipleLocator(5))
     ax_latency.set_ylabel("Additional load latency (cycles)")
     apply_grid(ax_latency)
-    plot_tlb_boundaries(ax_latency, num_l1_tlb_entries, num_l2_tlb_entries, show_label=True)
+    plot_l1_tlb_boundary(ax_latency, num_l1_tlb_entries, show_label=True)
     plot_tlb_miss_cost_estimates(ax_latency, l1_tlb_miss_cost, l2_tlb_miss_cost)
     ax_latency.legend(loc="upper left", handlelength=1.5)
 
@@ -203,7 +202,7 @@ def main() -> None:
     ax_tlb.legend(loc="upper left", handlelength=1.5)
     apply_percent_yaxis(ax_tlb)
     apply_grid(ax_tlb)
-    plot_tlb_boundaries(ax_tlb, num_l1_tlb_entries, num_l2_tlb_entries, show_label=False)
+    plot_l1_tlb_boundary(ax_tlb, num_l1_tlb_entries, show_label=False)
 
     apply_log2_xaxis(ax_tlb)
     fig.tight_layout()
