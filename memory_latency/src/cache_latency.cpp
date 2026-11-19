@@ -125,7 +125,7 @@ namespace memory_latency
             }
             const auto num_elements = buffer_size_in_bytes / padded_bytes_per_element;
 
-            auto buffer = common::allocate_hugepage_buffer<MemoryAddress>(buffer_size_in_bytes);
+            const auto buffer = common::allocate_hugepage_buffer<MemoryAddress>(buffer_size_in_bytes);
 
             auto cycle_counter = perf_counter_open_by_name(perf_events::CYCLES, -1);
             if (!perf_counter_is_valid(&cycle_counter))

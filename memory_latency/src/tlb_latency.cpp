@@ -81,7 +81,7 @@ namespace memory_latency
                 const auto virtual_page_offset = page_stride_bytes * page_index;
                 auto* const virtual_page_addr = reinterpret_cast<unsigned char*>(virtual_pages) + virtual_page_offset;
 
-                auto const* const mapped_page = mmap(virtual_page_addr, page_size, PROT_READ | PROT_WRITE,
+                const auto* const mapped_page = mmap(virtual_page_addr, page_size, PROT_READ | PROT_WRITE,
                                                      MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED, -1, 0);
                 if (mapped_page == MAP_FAILED)
                 {

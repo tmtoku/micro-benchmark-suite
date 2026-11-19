@@ -88,8 +88,8 @@ namespace memory_latency
                 const auto backing_page_index = virtual_page_index / num_aliases;
                 const auto backing_page_offset = static_cast<off_t>(backing_page_index * page_size);
 
-                auto* const mapped_page = mmap(virtual_page_addr, page_size, PROT_READ | PROT_WRITE,
-                                               MAP_SHARED | MAP_FIXED, backing_fd, backing_page_offset);
+                const auto* const mapped_page = mmap(virtual_page_addr, page_size, PROT_READ | PROT_WRITE,
+                                                     MAP_SHARED | MAP_FIXED, backing_fd, backing_page_offset);
                 if (mapped_page == MAP_FAILED)
                 {
                     throw std::bad_alloc();
