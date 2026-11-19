@@ -9,6 +9,7 @@ Checks: '
   performance-*,
   portability-*,
   -portability-avoid-pragma-once,
+  -portability-no-assembler,
   readability-*,
   -readability-implicit-bool-conversion,
   -readability-uppercase-literal-suffix,
@@ -21,6 +22,8 @@ CheckOptions:
   - key: misc-const-correctness.TransformValues
     value: true
   - key: misc-const-correctness.TransformReferences
+    value: true
+  - key: bugprone-signed-bitwise.IgnorePositiveIntegerLiterals
     value: true
 WarningsAsErrors: '*'
 HeaderFilterRegex: '(src|include)/.*'

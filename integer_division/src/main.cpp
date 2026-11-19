@@ -146,7 +146,7 @@ namespace integer_division
             constexpr auto DIVISOR = std::uint64_t{1};
             for (std::int32_t dividend_bits = MIN_BITS; dividend_bits <= MAX_BITS; ++dividend_bits)
             {
-                const auto dividend = std::uint64_t{1} << (dividend_bits - 1);
+                const auto dividend = std::uint64_t{1} << static_cast<std::uint32_t>(dividend_bits - 1);
 
                 const auto result = measure_latency<NUM_ITERATIONS>(
                     cycle_counter, [dividend] { return run_idiv_kernel<NUM_ITERATIONS>(dividend, DIVISOR); });
@@ -159,10 +159,10 @@ namespace integer_division
             }
 
             // Benchmark 2: Various quotient bits
-            constexpr auto DIVIDEND = std::uint64_t{1} << (MAX_BITS - 1);
+            constexpr auto DIVIDEND = std::uint64_t{1} << static_cast<std::uint32_t>(MAX_BITS - 1);
             for (std::int32_t quotient_bits = MIN_BITS; quotient_bits <= MAX_BITS; ++quotient_bits)
             {
-                const auto divisor = std::uint64_t{1} << (MAX_BITS - quotient_bits);
+                const auto divisor = std::uint64_t{1} << static_cast<std::uint32_t>(MAX_BITS - quotient_bits);
 
                 const auto result = measure_latency<NUM_ITERATIONS>(
                     cycle_counter, [divisor] { return run_idiv_kernel<NUM_ITERATIONS>(DIVIDEND, divisor); });
