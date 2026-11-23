@@ -20,6 +20,7 @@ Each benchmark demonstrates the empirical peak performance of a specific hardwar
 
 ```sh
 git clone --recursive https://github.com/tmtoku/micro-benchmark-suite
+cd micro-benchmark-suite
 cmake -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build
 ```
@@ -28,6 +29,42 @@ To target a specific microarchitecture (defaults to `native`):
 
 ```sh
 cmake -B build -DCMAKE_BUILD_TYPE=Release -DMICRO_BENCHMARK_SUITE_ARCH=znver2
+```
+
+## Setup
+
+Run the setup script before benchmarking (requires `sudo`):
+
+```sh
+./scripts/setup.sh
+```
+
+The script does the following:
+
+- Reserve 512 huge pages for benchmarks that allocate buffers with `MAP_HUGETLB`
+- Prevent 4 KiB pages from being promoted to huge pages automatically
+- Fix the CPU frequency at the base clock
+- Disable the NMI watchdog, which occupies a hardware performance counter
+- Disable ASLR
+
+## Running
+
+### Single-threaded benchmarks
+
+Pin IRQs (interrupt requests) to CPU 0 and run the benchmark on CPU 7:
+
+```sh
+./scripts/pin_irqs.sh 0
+sudo chrt -f 99 taskset -c 7 ./build/<path/to/benchmark>
+```
+
+### Multi-threaded benchmarks
+
+Distribute IRQs across all CPUs (e.g. 0-7) and run the benchmark with each thread bound to its own physical core:
+
+```sh
+./scripts/pin_irqs.sh 0-7
+sudo chrt -f 99 env OMP_PROC_BIND=true OMP_PLACES=cores ./build/<path/to/benchmark>
 ```
 
 ## Benchmarks
